@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Active Parking Session</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --classic-gold: #c5a059; }
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Times New Roman', serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .session-card {
+            border: 2px solid var(--classic-gold);
+            background: rgba(20,20,20,0.9);
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            width: 500px;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2);
+        }
+        .timer {
+            font-size: 3.5rem;
+            color: var(--classic-gold);
+            font-family: monospace;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .btn-exit {
+            background: #822;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-exit:hover { background: #a33; }
+    </style>
+</head>
+<body>
+<div class="session-card">
+    <h2 style="color: var(--classic-gold)">PARKING SESSION ACTIVE</h2>
+    <p class="text-muted">Slot: <span id="slotDisplay" style="color: white"></span></p>
+    <hr style="border-color: #333">
+    <p>REMAINING TIME UNTIL EXPIRY</p>
+    <div id="countdown" class="timer">--:--:--</div>
+    <p id="costDisplay">Base Rate: 200.00 LKR</p>
+    <button class="btn btn-exit" onclick="window.location.href='/gate.html'">Proceed to Exit Gate</button>
+</div>
+
+<script>
+    // Get details stored during Entry
+    const slotId = localStorage.getItem('activeSlot');
+    const expiryString = localStorage.getItem('expiryTime');
+
+    if (!slotId || !expiryString) {
+        window.location.href = "/index.html"; // Redirect if no session exists
+    }
+
+    document.getElementById('slotDisplay').innerText = slotId;
+
+    // Parse the expiry time string into a date object
+    const expiryDate = new Date(expiryString).getTime();
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const distance = expiryDate - now;
+
+        if (distance < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("countdown").innerHTML = "EXPIRED";
+            document.getElementById("countdown").style.color = "red";
+            return;
+        }
+
+        // Time calculations for hours, minutes and seconds
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Output the result with leading zeros
+        document.getElementById("countdown").innerHTML =
+            (hours < 10 ? "0" + hours : hours) + ":" +
+            (minutes < 10 ? "0" + minutes : minutes) + ":" +
+            (seconds < 10 ? "0" + seconds : seconds);
+    }
+
+    // Run immediately on load
+    updateTimer();
+    // Update every 1 second
+    const timerInterval = setInterval(updateTimer, 1000);
+</script>
+</body>
+</html>

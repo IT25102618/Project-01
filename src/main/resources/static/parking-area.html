@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Parking Area</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --classic-gold: #c5a059; }
+        body {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+                        url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover; color: white; font-family: 'Times New Roman', serif; min-height: 100vh;
+        }
+        .slot-card {
+            background: rgba(20, 20, 20, 0.9); border: 2px solid #333; border-radius: 15px;
+            padding: 25px; margin-bottom: 20px; transition: 0.3s;
+        }
+        .slot-card.occupied { border-color: #ff4b2b; opacity: 0.8; }
+        .slot-card.selected { border-color: var(--classic-gold); box-shadow: 0 0 15px var(--classic-gold); }
+        .price-tag { color: #00d2ff; font-size: 1.5rem; font-weight: bold; }
+        .btn-book { background: #000; color: var(--classic-gold); border: 1px solid var(--classic-gold); width: 100%; margin-top: 10px; font-weight: bold; }
+        .btn-book:disabled { border-color: #444; color: #444; }
+        #otpDisplay { display: none; background: var(--classic-gold); color: black; padding: 10px; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: var(--classic-gold);">🏎️ SELECT YOUR PARKING SLOT</h2>
+
+    <div class="alert alert-dark text-center" style="background: rgba(0,0,0,0.5); border: 1px solid var(--classic-gold);">
+        Booking for Plate: <b id="currentPlate">Detecting...</b>
+    </div>
+
+    <div class="row" id="slotGrid">
+    </div>
+
+    <div id="otpDisplay" class="text-center"></div>
+</div>
+
+<script>
+    // Retrieve plate from local storage (set during registration)
+    const plate = localStorage.getItem('registeredPlate');
+    if(!plate) {
+        alert("No registration found! Redirecting...");
+        window.location.href = "/driver-registration.html";
+    }
+    document.getElementById('currentPlate').innerText = plate;
+
+    async function loadSlots() {
+        const response = await fetch('/slots/view-all');
+        const slots = await response.json();
+        const grid = document.getElementById('slotGrid');
+        grid.innerHTML = '';
+
+        slots.forEach(slot => {
+            grid.innerHTML += `
+                <div class="col-md-4">
+                    <div class="slot-card ${slot.occupied ? 'occupied' : ''}">
+                        <div class="price-tag">200.00 LKR</div>
+                        <div class="text-muted">Slot: ${slot.slotId}</div>
+                        <div class="my-2">
+                            <small>Status: ${slot.occupied ? '🔴 Occupied' : '🟢 Free'}</small>
+                        </div>
+                        <button class="btn btn-book" onclick="bookSlot('${slot.slotId}')" ${slot.occupied ? 'disabled' : ''}>
+                            ${slot.occupied ? 'NOT AVAILABLE' : 'BOOK SLOT'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function bookSlot(id) {
+        const response = await fetch(`/slots/confirm-booking?slotId=${id}&plate=${plate}`);
+        const result = await response.text();
+
+        if(result.startsWith("SUCCESS:")) {
+            const otp = result.split(":")[1];
+            const display = document.getElementById('otpDisplay');
+            display.style.display = 'block';
+            display.innerHTML = `<h4>BOOKING CONFIRMED!</h4><p>Your Entry OTP: <b>${otp}</b></p>
+                                <a href="/gate.html" class="btn btn-dark">Proceed to Gate</a>`;
+            localStorage.setItem('activeOTP', otp);
+        } else {
+            alert(result);
+        }
+    }
+
+    loadSlots();
+</script>
+</body>
+</html>

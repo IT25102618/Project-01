@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Registration | Classic Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --classic-gold: #c5a059;
+            --dark-overlay: rgba(0, 0, 0, 0.75);
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Times New Roman', Times, serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Blurred Parking Background */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(var(--dark-overlay), var(--dark-overlay)),
+                              url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px);
+            transform: scale(1.1);
+            z-index: -1;
+        }
+
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Classic Registration Card */
+        .reg-card {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid var(--classic-gold);
+            border-radius: 15px;
+            padding: 40px;
+            width: 450px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .reg-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .reg-header span {
+            background: #03d2ff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .reg-header h2 {
+            display: inline;
+            margin-left: 10px;
+            letter-spacing: 1px;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        /* Form Styling */
+        label {
+            color: var(--classic-gold);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-control:focus {
+            background: #222;
+            border-color: var(--classic-gold);
+            color: white;
+            box-shadow: none;
+        }
+
+        /* Classic Black Button */
+        .btn-register {
+            background-color: #000;
+            color: white;
+            border: 1px solid var(--classic-gold);
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background-color: var(--classic-gold);
+            color: black;
+            cursor: pointer;
+        }
+
+        /* Unified Classic Footer */
+        footer {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid var(--classic-gold);
+            padding: 20px 0;
+            color: #bbb;
+        }
+
+        .footer-label {
+            color: var(--classic-gold);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .footer-item {
+            border-right: 1px solid #333;
+        }
+
+        .footer-item:last-child {
+            border-right: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-container"></div>
+
+<div class="layout-wrapper">
+    <div class="main-content">
+        <div class="reg-card">
+            <div class="reg-header">
+                <span>P</span>
+                <h2>Driver Registration</h2>
+            </div>
+
+            <form action="/drivers/register" method="get" onsubmit="savePlateLocally()">
+                <div class="mb-2">
+                    <label>Full Name:</label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter Full Name" required>
+                </div>
+                <div class="mb-2">
+                    <label>Contact No:</label>
+                    <input type="text" name="contact" id="contact" class="form-control" placeholder="Enter Mobile Number" required>
+                </div>
+                <div class="mb-2">
+                    <label>License Plate:</label>
+                    <input type="text" name="plate" id="plate" class="form-control" placeholder="e.g. ABC-1234" required>
+                </div>
+                <div class="mb-4">
+                    <label>Membership:</label>
+                    <select name="type" class="form-control">
+                        <option value="Member">Member (Monthly)</option>
+                        <option value="Guest">Guest (Hourly)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-register">Register Driver</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row text-center">
+                <div class="col footer-item">
+                    <div class="footer-label">About Us</div>
+                    <small>Premium Parking Solutions</small>
+                </div>
+                <div class="col footer-item">
+                    <div class="footer-label">Careers</div>
+                    <small>Join our Global Team</small>
+                </div>
+                <div class="col footer-item">
+                    <div class="footer-label">Email</div>
+                    <small>register@parkingsys.com</small>
+                </div>
+                <div class="col footer-item">
+                    <div class="footer-label">Phone</div>
+                    <small>+1-555-PARK-REG</small>
+                </div>
+                <div class="col footer-item">
+                    <div class="footer-label">Location</div>
+                    <small>Registration Desk, Level 1</small>
+                </div>
+            </div>
+            <div class="text-center mt-3" style="font-size: 0.7rem; color: #666;">
+                © 2026 Parking Solutions Ltd. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // Store details in localStorage so the user doesn't have to re-register next time
+    function savePlateLocally() {
+        const plateValue = document.getElementById('plate').value;
+        localStorage.setItem('registeredPlate', plateValue);
+    }
+</script>
+</body>
+</html>

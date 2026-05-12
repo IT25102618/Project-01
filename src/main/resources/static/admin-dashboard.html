@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Login</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; width: 350px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #03d2ff; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <h2>Staff Access</h2>
+    <form id="loginForm">
+        <label>Role:</label>
+        <select name="role" id="role">
+            <option value="Manager">Manager</option>
+            <option value="Attending Staff">Attending Staff</option>
+        </select>
+
+        <label>Admin ID:</label>
+        <input type="text" name="adminId" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">LOGIN / REGISTER</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('loginForm').onsubmit = async (e) => {
+        e.preventDefault(); // Prevents the 404/White Page error
+
+        const formData = new FormData(e.target);
+        const response = await fetch('/admin/login', {
+            method: 'POST',
+            body: new URLSearchParams(formData)
+        });
+
+        const result = await response.text();
+
+        if (result === "SHOW_MANAGER_UI") {
+            window.location.href = "/manager-dashboard.html";
+        } else if (result === "SHOW_STAFF_UI") {
+            window.location.href = "/parking-area.html";
+        } else {
+            alert("Error: " + result);
+        }
+    };
+</script>
+</body>
+</html>

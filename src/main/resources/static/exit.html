@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .exit-card { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px; border: 1px solid #ff4b2b; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="exit-card">
+    <h1>🚧 Exit Gate</h1>
+    <p>Enter your 4-digit OTP to leave</p>
+    <form action="/slots/exit-gate" method="get">
+        <input type="text" name="otp" class="form-control mb-3 text-center" placeholder="0000" required>
+        <button type="submit" class="btn btn-danger w-100">Verify & Open Gate</button>
+    </form>
+</div>
+</body>
+</html>

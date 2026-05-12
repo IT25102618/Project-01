@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manager Dashboard</title>
+    <style>
+        body {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                        url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1500');
+            background-size: cover; background-position: center;
+            color: white; font-family: sans-serif; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0;
+        }
+        .container { background: rgba(0,0,0,0.85); padding: 30px; border-radius: 20px; border: 2px solid #ffeb3b; text-align: center; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #ffeb3b; margin-bottom: 20px; }
+        .search-box { background: #fff9c4; color: #333; padding: 15px; width: 85%; border-radius: 10px; border: 2px solid #fbc02d; font-size: 1.1rem; font-weight: bold; outline: none; }
+        .btn-group { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { transform: scale(1.05); }
+        #results { margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: left; min-height: 50px; border-left: 4px solid #ffeb3b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Manager Portal</h1>
+    <p>Enter Vehicle Plate Number:</p>
+    <input type="text" id="plate" class="search-box" placeholder="Ex: CAS-1234">
+
+    <div class="btn-group">
+        <button class="btn" style="background: #ffeb3b;" onclick="handleSearch()">SEARCH</button>
+        <button class="btn" style="background: #4caf50; color: white;" onclick="handleUpdate()">UPDATE TYPE</button>
+        <button class="btn" style="background: #f44336; color: white;" onclick="handleDelete()">DELETE</button>
+    </div>
+
+    <div id="results">Search results will appear here...</div>
+
+    <button class="btn" style="background: #757575; color: white; width: 100%; margin-top: 20px;" onclick="window.location.href='/index.html'">LOGOUT</button>
+</div>
+
+<script>
+    // 1. SEARCH FUNCTION
+    async function handleSearch() {
+        const plate = document.getElementById('plate').value;
+        if (!plate) { alert("Enter a plate first!"); return; }
+
+        const res = await fetch('/admin/search-driver?plate=' + plate);
+        const data = await res.text();
+        document.getElementById('results').innerHTML = data === "Not Found"
+            ? "<span style='color: #ff5252;'>User not found.</span>"
+            : "<strong>Details Found:</strong><br>" + data;
+    }
+
+    // 2. UPDATE FUNCTION
+    async function handleUpdate() {
+        const plate = document.getElementById('plate').value;
+        if (!plate) { alert("Search for a user first!"); return; }
+
+        const newType = prompt("Enter new Membership Type (e.g., Member or Guest):");
+        if (!newType) return;
+
+        // Notice the URL matches the @PostMapping in your Java Controller
+        const res = await fetch(`/admin/update-driver?plate=${plate}&newType=${newType}`, { method: 'POST' });
+        const status = await res.text();
+
+        if (status === "UPDATE_SUCCESS") {
+            alert("Successfully Updated!");
+            handleSearch(); // Refresh the display
+        } else {
+            alert("Error: User not found or could not update.");
+        }
+    }
+
+    // 3. DELETE FUNCTION
+    async function handleDelete() {
+        const plate = document.getElementById('plate').value;
+        if (!plate) { alert("Enter a plate to delete."); return; }
+
+        if (!confirm("Are you sure you want to PERMANENTLY delete record " + plate + "?")) return;
+
+        const res = await fetch(`/admin/delete-driver?plate=${plate}`, { method: 'POST' });
+        const status = await res.text();
+
+        if (status === "DELETE_SUCCESS") {
+            alert("User deleted successfully.");
+            document.getElementById('results').innerHTML = "Record removed from database.";
+            document.getElementById('plate').value = "";
+        } else {
+            alert("Error: Could not find user to delete.");
+        }
+    }
+</script>
+</body>
+</html>

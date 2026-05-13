@@ -7,9 +7,8 @@ import java.util.List;
 @RequestMapping("/parking")
 public class ParkingController {
 
-    // Entry: Record a vehicle [cite: 78]
-    // Test URL: http://localhost:8080/parking/entry?plate=ABC-123&pin=1234
     @GetMapping("/entry")
+    // create operation of CRDU operation
     public String checkIn(@RequestParam String plate, @RequestParam String pin) {
         ParkingSession session = new ParkingSession(plate, pin);
         FileHandler.saveSession(session);
@@ -23,9 +22,9 @@ public class ParkingController {
                 "</div></body>";
     }
 
-    // Read: View all logs [cite: 79]
-    // Test URL: http://localhost:8080/parking/logs
+
     @GetMapping("/logs")
+    // Read of CRDU function
     public String viewLogs() {
         List<String> logs = FileHandler.readLogs();
         StringBuilder html = new StringBuilder("<head><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'></head>");
@@ -39,14 +38,16 @@ public class ParkingController {
         html.append("</tbody></table><a href='/index.html' class='btn btn-primary'>Back</a></body>");
         return html.toString();
     }
-    // Exit: Update logs and show fee [cite: 80]
-    // Test URL: http://localhost:8080/parking/exit?pin=1234
+
     @GetMapping("/exit")
+
+    // U\D fuctions of CRDU operations
     public String checkOut(@RequestParam String pin) {
-        // For a real project, you would search for the pin in the file
-        // Here is a simplified response for your demonstration
+
         return "Exit recorded for PIN " + pin + ". Total Fee calculated.";
     }
+
+
 
 
 }

@@ -10,7 +10,7 @@ public class ParkingSlot {
     private LocalDateTime startTime;
     private LocalDateTime expiryTime;
 
-    // Default constructor (Needed for JSON conversion)
+    // Default constructor 
     public ParkingSlot() {}
 
     public ParkingSlot(String id) {

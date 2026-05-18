@@ -31,6 +31,7 @@ public class FileHandler {
         List<String> slots = new ArrayList<>();
 
         //open file for reading
+        //try with resources automatically closes the reader after use
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
 

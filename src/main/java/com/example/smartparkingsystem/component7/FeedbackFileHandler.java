@@ -1,4 +1,4 @@
-package com.example.parkingmanagement.component4;
+package com.demo.parkingmanagementsystem.component5;
 
 import java.io.*;
 import java.util.*;

@@ -1,10 +1,10 @@
-package com.example.parkingmanagement;
+package com.example.smartparkingsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ParkingManagementApplicationTests {
+class SmartParkingSystemApplicationTests {
 
     @Test
     void contextLoads() {

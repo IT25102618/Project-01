@@ -13,7 +13,7 @@
     <h1>🚧 Exit Gate</h1>
     <p>Enter your 4-digit OTP to leave</p>
     <form action="/slots/exit-gate" method="get">
-        <input type="text" name="otp" class="form-control mb-3 text-center" placeholder="0000" required>
+        <input type="text" name="otp" class="form-control mb-3 text-center" placeholder="0000" pattern="\d{4}" title="Must be exactly 4 digits" required>
         <button type="submit" class="btn btn-danger w-100">Verify & Open Gate</button>
     </form>
 </div>

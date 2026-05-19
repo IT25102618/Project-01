@@ -5,165 +5,80 @@
     <title>Gate Control | System Verification</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --classic-gold: #c5a059;
-            --dark-bg: #0a0a0a;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: white;
-            font-family: 'Times New Roman', Times, serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        /* Verification Card styling to match image_9e3514.png */
-        .gate-card {
-            border: 2px solid var(--classic-gold);
-            background: #111;
-            padding: 50px;
-            border-radius: 15px;
-            text-align: center;
-            width: 500px;
-            box-shadow: 0 0 40px rgba(0,0,0,1);
-        }
-
-        h2 {
-            color: var(--classic-gold);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-
-        /* Large OTP Input field */
-        .otp-input {
-            background: #222 !important;
-            border: 1px solid var(--classic-gold) !important;
-            color: white !important;
-            font-size: 3rem !important;
-            text-align: center;
-            letter-spacing: 15px;
-            margin-bottom: 30px;
-            height: 80px;
-            font-family: monospace;
-        }
-
-        /* Action Buttons */
-        .btn-gate {
-            padding: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .btn-entry {
-            border: 1px solid var(--classic-gold);
-            color: var(--classic-gold);
-            background: transparent;
-        }
-
-        .btn-entry:hover {
-            background: var(--classic-gold);
-            color: black;
-        }
-
-        .btn-exit {
-            border: 1px solid #ff4b2b;
-            color: #ff4b2b;
-            background: transparent;
-        }
-
-        .btn-exit:hover {
-            background: #ff4b2b;
-            color: white;
-        }
-
-        /* Status Text */
-        #resultDisplay {
-            margin-top: 30px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            min-height: 40px;
-        }
-
-        .status-granted { color: #28a745; text-transform: uppercase; }
-        .status-denied { color: #dc3545; text-transform: uppercase; }
-        .fare-display { color: #00d2ff; }
+        :root { --classic-gold: #c5a059; --dark-bg: #0a0a0a; }
+        body { background-color: var(--dark-bg); color: white; font-family: 'serif'; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .gate-card { border: 2px solid var(--classic-gold); background: #111; padding: 50px; border-radius: 15px; text-align: center; width: 500px; box-shadow: 0 0 40px rgba(0,0,0,1); }
+        .status-granted { color: #2ecc71; font-weight: bold; font-size: 1.5rem; }
+        .status-denied { color: #e74c3c; font-weight: bold; }
+        .fare-display { color: #00d2ff; font-size: 1.8rem; margin-top: 10px; display: block; }
+        .otp-input { background: #222; border: 1px solid var(--classic-gold); color: white; font-size: 2rem; text-align: center; letter-spacing: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="gate-card">
-    <h2>System Verification</h2>
-    <p>Enter OTP to Open Gate</p>
+    <h2 class="mb-4">SYSTEM VERIFICATION</h2>
+    <p>Please enter your 4-digit OTP</p>
 
-    <input type="text" id="otpInput" class="form-control otp-input" maxlength="4" placeholder="0000">
+    <input type="text" id="otpInput" class="form-control otp-input" maxlength="4" placeholder="0000" pattern="\d{4}" title="Must be exactly 4 digits">
 
-    <div class="row g-3">
-        <div class="col-6">
-            <button class="btn btn-gate btn-entry" onclick="verifyGate('entry')">Entry</button>
-        </div>
-        <div class="col-6">
-            <button class="btn btn-gate btn-exit" onclick="verifyGate('exit')">Exit</button>
-        </div>
+    <div class="d-flex gap-3">
+        <button class="btn btn-outline-warning w-100" onclick="verifyOTP('entry')">ENTRY</button>
+        <button class="btn btn-danger w-100" onclick="verifyOTP('exit')">EXIT</button>
     </div>
 
-    <div id="resultDisplay"></div>
+    <div id="statusDisplay" class="mt-4"></div>
 </div>
 
 <script>
-    async function verifyGate(action) {
+    async function verifyOTP(action) {
         const otp = document.getElementById('otpInput').value;
-        const display = document.getElementById('resultDisplay');
+        const display = document.getElementById('statusDisplay');
 
-        if (otp.length < 4) {
-            alert("Please enter a valid 4-digit OTP.");
+        if (!otp) {
+            alert("Please enter your 4-digit OTP");
+            return;
+        }
+
+        if (!/^\d{4}$/.test(otp)) {
+            alert("OTP must be exactly 4 digits");
             return;
         }
 
         try {
-            // Calling your updated Java SlotController
+            // This calls your SlotController.java @RequestMapping("/slots")
             const response = await fetch(`/slots/gate-control?otp=${otp}&action=${action}`);
             const data = await response.json();
 
             if (data.status === "ENTRY_SUCCESS") {
-                display.innerHTML = `<span class="status-granted">Entry Granted</span>`;
-
-                // Save session details for the timer page
+                display.innerHTML = `<span class="status-granted">ENTRY GRANTED</span>`;
                 localStorage.setItem('activeSlot', data.slotId);
                 localStorage.setItem('expiryTime', data.expiry);
 
-                // Automatically move to the active slot session after 2 seconds
-                setTimeout(() => {
-                    window.location.href = "/active-session.html";
-                }, 2000);
+                setTimeout(() => { window.location.href = "/active-session.html"; }, 2000);
 
             } else if (data.status === "EXIT_SUCCESS") {
-                display.innerHTML = `<span class="status-granted">Exit Granted</span><br>
-                                     <span class="fare-display">Total Fare: ${data.fare} LKR</span>`;
+                // 1. Show Success and the Fare
+                display.innerHTML = `
+                    <span class="status-granted">EXIT GRANTED</span><br>
+                    <span class="fare-display">Total Fare: ${data.fare} LKR</span>
+                    <p class="text-muted mt-2">Redirecting to feedback...</p>
+                `;
 
-                // Clear local data upon exit
-                localStorage.removeItem('activeSlot');
-                localStorage.removeItem('expiryTime');
-                localStorage.removeItem('activeOTP');
+                // 2. Clear Session Data
+                localStorage.clear();
+
+                // 3. AUTO REDIRECT after 3 seconds
+                setTimeout(() => {
+                    window.location.href = "/feedback.html";
+                }, 3500);
 
             } else {
-                display.innerHTML = `<span class="status-denied">Invalid OTP</span>`;
+                display.innerHTML = `<span class="status-denied">INVALID OTP</span>`;
             }
         } catch (error) {
             console.error("Error:", error);
-            display.innerHTML = `<span class="status-denied">System Connection Error</span>`;
+            display.innerHTML = `<span class="status-denied">CONNECTION ERROR</span>`;
         }
     }
 </script>

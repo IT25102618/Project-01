@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manager Dashboard</title>
+    <title>Manager Dashboard | OTP Recovery</title>
     <style>
         body {
             background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
@@ -11,82 +11,127 @@
             color: white; font-family: sans-serif; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0;
         }
-        .container { background: rgba(0,0,0,0.85); padding: 30px; border-radius: 20px; border: 2px solid #ffeb3b; text-align: center; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { color: #ffeb3b; margin-bottom: 20px; }
-        .search-box { background: #fff9c4; color: #333; padding: 15px; width: 85%; border-radius: 10px; border: 2px solid #fbc02d; font-size: 1.1rem; font-weight: bold; outline: none; }
+        .container { background: rgba(0,0,0,0.85); padding: 30px; border-radius: 20px; border: 2px solid #ffeb3b; text-align: center; width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #ffeb3b; margin-bottom: 20px; letter-spacing: 1px; }
+        .search-box { background: #fff9c4; color: #333; padding: 15px; width: 85%; border-radius: 10px; border: 2px solid #fbc02d; font-size: 1.1rem; font-weight: bold; outline: none; text-transform: uppercase; }
         .btn-group { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); }
-        #results { margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: left; min-height: 50px; border-left: 4px solid #ffeb3b; }
+        .btn { padding: 12px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; flex: 1; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        #results { margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: left; min-height: 50px; border-left: 4px solid #ffeb3b; }
+        .otp-highlight { background: #ffeb3b; color: #000; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 1.2rem; }
+        .info-row { margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Manager Portal</h1>
-    <p>Enter Vehicle Plate Number:</p>
-    <input type="text" id="plate" class="search-box" placeholder="Ex: CAS-1234">
+    <p>Recover PIN or Update Driver Details:</p>
+    <input type="text" id="plate" class="search-box" placeholder="Ex: AB1234" maxlength="6">
 
     <div class="btn-group">
         <button class="btn" style="background: #ffeb3b;" onclick="handleSearch()">SEARCH</button>
-        <button class="btn" style="background: #4caf50; color: white;" onclick="handleUpdate()">UPDATE TYPE</button>
+        <button class="btn" style="background: #4caf50; color: white;" onclick="handleUpdate()">EDIT PHONE</button>
         <button class="btn" style="background: #f44336; color: white;" onclick="handleDelete()">DELETE</button>
     </div>
 
-    <div id="results">Search results will appear here...</div>
+    <div id="results">Enter a valid plate (e.g., AB1234) to view details.</div>
 
     <button class="btn" style="background: #757575; color: white; width: 100%; margin-top: 20px;" onclick="window.location.href='/index.html'">LOGOUT</button>
 </div>
 
 <script>
-    // 1. SEARCH FUNCTION
+    // 1. SEARCH FUNCTION - Retrieves Driver Info + Active PIN
     async function handleSearch() {
-        const plate = document.getElementById('plate').value;
-        if (!plate) { alert("Enter a plate first!"); return; }
+        const plate = document.getElementById('plate').value.trim().toUpperCase();
+        const resultsDiv = document.getElementById('results');
 
-        const res = await fetch('/admin/search-driver?plate=' + plate);
-        const data = await res.text();
-        document.getElementById('results').innerHTML = data === "Not Found"
-            ? "<span style='color: #ff5252;'>User not found.</span>"
-            : "<strong>Details Found:</strong><br>" + data;
+        if (!plate) {
+            alert("Please enter a vehicle plate.");
+            return;
+        }
+
+        try {
+            // Note: Server returns a comma-separated string: Name,Contact,Plate,Type,OTP
+            const res = await fetch(`/admin/search-driver?plate=${plate}&t=${Date.now()}`);
+            const data = await res.text();
+
+            if (data === "NOT_FOUND") {
+                resultsDiv.innerHTML = "<p style='color:#ff5252; text-align:center;'><b>User Not Found</b></p>";
+            } else if (data === "ERROR") {
+                resultsDiv.innerHTML = "<p style='color:orange;'>Database error occurred.</p>";
+            } else {
+                const parts = data.split(",");
+                // parts[0]=Name, [1]=Contact, [2]=Plate, [3]=Type, [4]=OTP
+                resultsDiv.innerHTML = `
+                    <div class="info-row"><b>Driver:</b> ${parts[0]}</div>
+                    <div class="info-row"><b>Contact:</b> ${parts[1]}</div>
+                    <div class="info-row"><b>Vehicle:</b> ${parts[2]} (${parts[3]})</div>
+                    <div style="margin-top:15px; text-align:center;">
+                        <span style="display:block; font-size:0.9rem; color:#aaa; margin-bottom:5px;">ACTIVE PIN / OTP</span>
+                        <span class="otp-highlight">${parts[4]}</span>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            resultsDiv.innerHTML = "<p style='color:red;'>Connection lost. Check server.</p>";
+        }
     }
 
-    // 2. UPDATE FUNCTION
+    // 2. UPDATE FUNCTION - Updates Phone Number
     async function handleUpdate() {
-        const plate = document.getElementById('plate').value;
-        if (!plate) { alert("Search for a user first!"); return; }
+        const plate = document.getElementById('plate').value.trim().toUpperCase();
+        if (!plate) { alert("Search for a plate first!"); return; }
 
-        const newType = prompt("Enter new Membership Type (e.g., Member or Guest):");
-        if (!newType) return;
+        const newPhone = prompt("Enter the NEW 10-digit Phone Number for " + plate + ":");
 
-        // Notice the URL matches the @PostMapping in your Java Controller
-        const res = await fetch(`/admin/update-driver?plate=${plate}&newType=${newType}`, { method: 'POST' });
-        const status = await res.text();
+        // Validate 10 digits
+        if (newPhone === null) return; // Cancelled
+        if (!newPhone.match(/^\d{10}$/)) {
+            alert("Invalid Input! Phone number must be exactly 10 digits.");
+            return;
+        }
 
-        if (status === "UPDATE_SUCCESS") {
-            alert("Successfully Updated!");
-            handleSearch(); // Refresh the display
-        } else {
-            alert("Error: User not found or could not update.");
+        try {
+            const res = await fetch(`/admin/update-driver?plate=${plate}&newContact=${encodeURIComponent(newPhone)}`, {
+                method: 'POST'
+            });
+            const status = await res.text();
+
+            if (status === "UPDATE_SUCCESS") {
+                alert("Phone number updated successfully!");
+                handleSearch(); // Refresh results
+            } else if (status === "INVALID_PHONE") {
+                alert("Error: Server rejected the phone format.");
+            } else {
+                alert("Error: Record not found.");
+            }
+        } catch (error) {
+            alert("System Error. Please try again.");
         }
     }
 
     // 3. DELETE FUNCTION
     async function handleDelete() {
-        const plate = document.getElementById('plate').value;
+        const plate = document.getElementById('plate').value.trim().toUpperCase();
         if (!plate) { alert("Enter a plate to delete."); return; }
 
-        if (!confirm("Are you sure you want to PERMANENTLY delete record " + plate + "?")) return;
+        if (!confirm("PERMANENTLY delete record " + plate + "? This cannot be undone.")) return;
 
-        const res = await fetch(`/admin/delete-driver?plate=${plate}`, { method: 'POST' });
-        const status = await res.text();
+        try {
+            const res = await fetch(`/admin/delete-driver?plate=${plate}`, { method: 'POST' });
+            const status = await res.text();
 
-        if (status === "DELETE_SUCCESS") {
-            alert("User deleted successfully.");
-            document.getElementById('results').innerHTML = "Record removed from database.";
-            document.getElementById('plate').value = "";
-        } else {
-            alert("Error: Could not find user to delete.");
+            if (status === "DELETE_SUCCESS") {
+                alert("Driver record deleted.");
+                document.getElementById('results').innerHTML = "Record removed.";
+                document.getElementById('plate').value = "";
+            } else {
+                alert("Error: Driver not found.");
+            }
+        } catch (e) {
+            alert("Connection Error.");
         }
     }
 </script>

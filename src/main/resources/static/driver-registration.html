@@ -2,23 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Driver Registration | Classic Portal</title>
+    <title>Driver Registration | Premium Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --primary-accent: #00d2ff;
+            --primary-hover: #3a7bd5;
             --classic-gold: #c5a059;
-            --dark-overlay: rgba(0, 0, 0, 0.75);
+            --dark-overlay: rgba(10, 10, 12, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
         body, html {
             height: 100%;
             margin: 0;
-            font-family: 'Times New Roman', Times, serif;
-            color: white;
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
             overflow: hidden;
+            background-color: #050505;
         }
 
-        /* Blurred Parking Background */
+        /* Animated Dynamic Background */
         .bg-container {
             position: fixed;
             top: 0;
@@ -29,9 +35,15 @@
                               url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&q=80&w=1920');
             background-size: cover;
             background-position: center;
-            filter: blur(10px);
-            transform: scale(1.1);
+            filter: blur(8px);
+            transform: scale(1.05);
             z-index: -1;
+            animation: bg-pan 30s infinite alternate ease-in-out;
+        }
+
+        @keyframes bg-pan {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
         }
 
         .layout-wrapper {
@@ -47,107 +59,193 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
-        /* Classic Registration Card */
+        /* Glassmorphism Registration Card */
         .reg-card {
-            background: rgba(20, 20, 20, 0.9);
-            border: 2px solid var(--classic-gold);
-            border-radius: 15px;
-            padding: 40px;
-            width: 450px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        .reg-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0,210,255,0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            border-color: rgba(0, 210, 255, 0.3);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .reg-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            position: relative;
         }
 
-        .reg-header span {
-            background: #03d2ff;
+        .logo-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-accent), var(--primary-hover));
             color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-family: sans-serif;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0, 210, 255, 0.4);
         }
 
         .reg-header h2 {
-            display: inline;
-            margin-left: 10px;
-            letter-spacing: 1px;
-            color: white;
+            margin: 0;
+            letter-spacing: 0.5px;
+            color: #ffffff;
             font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .reg-header p {
+            color: #a0a0b0;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
 
         /* Form Styling */
+        .form-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
         label {
-            color: var(--classic-gold);
-            text-transform: uppercase;
+            color: #d0d0e0;
             font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
         }
 
         .form-control {
-            background: #1a1a1a;
-            border: 1px solid #444;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
 
         .form-control:focus {
-            background: #222;
-            border-color: var(--classic-gold);
+            background: rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-accent);
             color: white;
-            box-shadow: none;
+            box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2), inset 0 2px 4px rgba(0,0,0,0.2);
+            outline: none;
         }
 
-        /* Classic Black Button */
+        .form-group:focus-within label {
+            color: var(--primary-accent);
+        }
+
+        /* Elegant Gradient Button */
         .btn-register {
-            background-color: #000;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
             color: white;
-            border: 1px solid var(--classic-gold);
+            border: none;
+            border-radius: 10px;
             width: 100%;
-            padding: 12px;
-            font-weight: bold;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-top: 10px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-register:hover::before {
+            left: 100%;
         }
 
         .btn-register:hover {
-            background-color: var(--classic-gold);
-            color: black;
-            cursor: pointer;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4);
         }
 
-        /* Unified Classic Footer */
+        .btn-register:active {
+            transform: translateY(1px);
+        }
+
+        /* Select Styling tweaks for dark mode */
+        select.form-control option {
+            background-color: #1a1a24;
+            color: white;
+            padding: 10px;
+        }
+
+        /* Unified Modern Footer */
         footer {
             width: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 1px solid var(--classic-gold);
-            padding: 20px 0;
-            color: #bbb;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px 0;
+            color: #888;
         }
 
         .footer-label {
             color: var(--classic-gold);
-            font-weight: bold;
+            font-weight: 600;
             text-transform: uppercase;
             font-size: 0.75rem;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
         }
 
         .footer-item {
-            border-right: 1px solid #333;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 15px;
         }
 
         .footer-item:last-child {
             border-right: none;
+        }
+
+        .footer-item small {
+            font-size: 0.8rem;
+            color: #a0a0b0;
         }
     </style>
 </head>
@@ -159,30 +257,39 @@
     <div class="main-content">
         <div class="reg-card">
             <div class="reg-header">
-                <span>P</span>
+                <div class="logo-mark">P</div>
                 <h2>Driver Registration</h2>
+                <p>Enter your details to generate your access token.</p>
             </div>
 
             <form action="/drivers/register" method="get" onsubmit="savePlateLocally()">
-                <div class="mb-2">
-                    <label>Full Name:</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter Full Name" required>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
                 </div>
-                <div class="mb-2">
-                    <label>Contact No:</label>
-                    <input type="text" name="contact" id="contact" class="form-control" placeholder="Enter Mobile Number" required>
+
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="contact" id="contact" class="form-control"
+                           placeholder="10-digit mobile number"
+                           pattern="\d{10}" title="Must be exactly 10 digits (e.g., 0771234567)" required>
                 </div>
-                <div class="mb-2">
-                    <label>License Plate:</label>
-                    <input type="text" name="plate" id="plate" class="form-control" placeholder="e.g. ABC-1234" required>
+
+                <div class="form-group">
+                    <label>License Plate</label>
+                    <input type="text" name="plate" id="plate" class="form-control"
+                           placeholder="e.g. AB1234"
+                           pattern="[A-Za-z]{2}\d{4}" title="Must be 2 letters followed by 4 numbers (e.g., AB1234)" required>
                 </div>
-                <div class="mb-4">
-                    <label>Membership:</label>
+
+                <div class="form-group">
+                    <label>Membership Type</label>
                     <select name="type" class="form-control">
                         <option value="Member">Member (Monthly)</option>
                         <option value="Guest">Guest (Hourly)</option>
                     </select>
                 </div>
+
                 <button type="submit" class="btn-register">Register Driver</button>
             </form>
         </div>
@@ -193,27 +300,27 @@
             <div class="row text-center">
                 <div class="col footer-item">
                     <div class="footer-label">About Us</div>
-                    <small>Premium Parking Solutions</small>
+                    <small>Premium Parking</small>
                 </div>
                 <div class="col footer-item">
                     <div class="footer-label">Careers</div>
-                    <small>Join our Global Team</small>
+                    <small>Join our Team</small>
                 </div>
                 <div class="col footer-item">
                     <div class="footer-label">Email</div>
-                    <small>register@parkingsys.com</small>
+                    <small>hello@parkingsys.com</small>
                 </div>
                 <div class="col footer-item">
                     <div class="footer-label">Phone</div>
-                    <small>+1-555-PARK-REG</small>
+                    <small>+1-555-PARKING</small>
                 </div>
-                <div class="col footer-item">
+                <div class="col footer-item d-none d-md-block">
                     <div class="footer-label">Location</div>
-                    <small>Registration Desk, Level 1</small>
+                    <small>Level 1 Concierge</small>
                 </div>
             </div>
-            <div class="text-center mt-3" style="font-size: 0.7rem; color: #666;">
-                © 2026 Parking Solutions Ltd. All rights reserved.
+            <div class="text-center mt-4" style="font-size: 0.75rem; color: #555;">
+                © 2026 Parking Solutions Ltd. All rights reserved. Designed for excellence.
             </div>
         </div>
     </footer>

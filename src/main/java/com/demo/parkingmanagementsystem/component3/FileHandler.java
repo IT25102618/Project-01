@@ -1,41 +1,51 @@
 package com.demo.parkingmanagementsystem.component3;
-//call the input /output library of java
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileHandler {
-    private static final String FILE_NAME = "parking_logs.txt";
-
-
-    private static final String FILE_PATH = "C:UsersNithuDesktopParkingManagementSystemparking_logs.txt";
-    // create function of CRDU operation
+    private static final String FILE_PATH = System.getProperty("user.dir") + File.separator + "parking_logs.txt";
 
     public static void saveSession(ParkingSession session) {
-        // without this nez cars will overide the old
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            writer.write(session.toString());
+            writer.write(session.toFileFormat());
             writer.newLine();
-            System.out.println("Data successfully written to templates/parking_logs.txt");
-        // error handler
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-        }
+            writer.flush();
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // Read of CRDU function
     public static List<String> readLogs() {
-        //initialize empty list
         List<String> logs = new ArrayList<>();
-        //closes automatically even if error
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-            //read ech line until empty and store it to list
+        File file = new File(FILE_PATH);
+        if (!file.exists()) return logs;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                logs.add(line);
+                if (!line.trim().isEmpty()) logs.add(line);
             }
-        } catch (IOException e) { /* File might not exist yet */ }
+        } catch (IOException e) { e.printStackTrace(); }
         return logs;
     }
 
+    public static String findAndRemoveSession(String pin) {
+        List<String> logs = readLogs();
+        String foundData = null;
+        List<String> remaining = new ArrayList<>();
+        for (String line : logs) {
+            String[] parts = line.split(",");
+            if (parts.length > 1 && parts[1].trim().equals(pin.trim())) {
+                foundData = line;
+            } else {
+                remaining.add(line);
+            }
+        }
+        if (foundData != null) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, false))) {
+                for (String l : remaining) { writer.write(l); writer.newLine(); }
+                writer.flush();
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+        return foundData;
+    }
 }

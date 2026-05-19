@@ -12,7 +12,7 @@ public class FileHandler {
     // create function of CRDU operation
 
     public static void saveSession(ParkingSession session) {
-
+        // without this nez cars will overide the old
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             writer.write(session.toString());
             writer.newLine();
@@ -27,6 +27,7 @@ public class FileHandler {
     public static List<String> readLogs() {
         //initialize empty list
         List<String> logs = new ArrayList<>();
+        //closes automatically even if error
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             //read ech line until empty and store it to list
             String line;

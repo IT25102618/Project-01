@@ -1,13 +1,12 @@
 package com.demo.parkingmanagementsystem.component3;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 
-public class ParkingSession {
-    // Encapsulation: private
-    private String plate;
-    private String pin;
-    //automatic entry time
-    private LocalDateTime entryTime;
+public abstract class ParkingSession {
+    protected String plate;
+    protected String pin;
+    protected LocalDateTime entryTime;
 
     public ParkingSession(String plate, String pin) {
         this.plate = plate;
@@ -15,11 +14,28 @@ public class ParkingSession {
         this.entryTime = LocalDateTime.now();
     }
 
-    // Abstraction,polymorphism
+    public abstract double calculateFee(LocalDateTime exitTime);
+
+    public String toFileFormat() {
+        String type = (this instanceof MonthlySession) ? "MONTHLY" : "HOURLY";
+        return plate + "," + pin + "," + entryTime.toString() + "," + type;
+    }
+}
+
+class HourlySession extends ParkingSession {
+    public HourlySession(String plate, String pin) { super(plate, pin); }
     @Override
-    //complex data to simple format abstract
-    public String toString() {
-        
-        return "Plate: " + plate + " | PIN: " + pin + " | Entered: " + entryTime;
+    public double calculateFee(LocalDateTime exitTime) {
+        long mins = Duration.between(this.entryTime, exitTime).toMinutes();
+        return (mins < 1 ? 1 : mins) * 10.0;
+    }
+}
+
+class MonthlySession extends ParkingSession {
+    public MonthlySession(String plate, String pin) { super(plate, pin); }
+    @Override
+    public double calculateFee(LocalDateTime exitTime) {
+        long mins = Duration.between(this.entryTime, exitTime).toMinutes();
+        return (mins < 1 ? 1 : mins) * 3.0;
     }
 }

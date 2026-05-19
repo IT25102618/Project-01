@@ -1,54 +1,42 @@
 package com.demo.parkingmanagementsystem.component3;
 
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-//handles http rewuest
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/parking")
 public class ParkingController {
 
-    @GetMapping("/entry")
-    // create operation of CRDU operation
-    //rewuest param grabs deteils from URL
-    public String checkIn(@RequestParam String plate, @RequestParam String pin) {
-        ParkingSession session = new ParkingSession(plate, pin);
-        FileHandler.saveSession(session);
+    @GetMapping(value = "/exit", produces = "text/html") // Force browser to read as HTML
+    public String checkOut(@RequestParam String pin) {
+        String data = FileHandler.findAndRemoveSession(pin);
 
-        return "<body style='background: #0f2027; background: linear-gradient(to right, #2c5364, #203a43, #0f2027); color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh;'>" +
-                "<div style='background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding: 50px; border-radius: 20px; border: 2px solid #00d2ff; text-align: center;'>" +
-                "<div style='font-size: 50px;'>🚧</div>" +
-                "<h1 style='color: #00d2ff;'>Gate Opening...</h1>" +
-                "<p>Vehicle <b>" + plate + "</b> has been logged. Please proceed to your assigned slot.</p>" +
-                "<a href='/index.html' style='display: inline-block; margin-top: 20px; padding: 10px 25px; border: 1px solid #00d2ff; color: #00d2ff; text-decoration: none; border-radius: 5px;'>Close Gate</a>" +
-                "</div></body>";
-    }
-
-
-    @GetMapping("/logs")
-    // Read of CRDU function
-    public String viewLogs() {
-        List<String> logs = FileHandler.readLogs();
-        StringBuilder html = new StringBuilder("<head><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'></head>");
-        html.append("<body class='p-5 bg-dark text-white'><h2>System Activity Logs</h2><table class='table table-dark table-striped mt-4'>");
-        html.append("<thead><tr><th>Log Details</th></tr></thead><tbody>");
-
-        for (String log : logs) {
-            html.append("<tr><td>").append(log).append("</td></tr>");
+        if (data == null) {
+            return "<body style='background:#121212; color:red; text-align:center; padding-top:50px; font-family:sans-serif;'>" +
+                    "<h2>❌ INVALID PIN</h2><a href='/index.html' style='color:white;'>Try Again</a></body>";
         }
 
-        html.append("</tbody></table><a href='/index.html' class='btn btn-primary'>Back</a></body>");
-        return html.toString();
+        String[] p = data.split(",");
+        String plate = p[0];
+        LocalDateTime entry = LocalDateTime.parse(p[2]);
+        String type = p[3];
+
+        ParkingSession session = type.equals("MONTHLY") ?
+                new MonthlySession(plate, pin) : new HourlySession(plate, pin);
+
+        session.entryTime = entry;
+        double fee = session.calculateFee(LocalDateTime.now());
+
+        // This returns a "Bill Card" that automatically redirects after 3 seconds
+        return "<html><body style='background: #121212; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;'>" +
+                "<div style='border: 2px solid #00c851; padding: 40px; border-radius: 15px; text-align: center;'>" +
+                "<h1 style='color: #00c851;'>EXIT GRANTED</h1>" +
+                "<h2 style='color: #00bcd4;'>Total Fare: " + String.format("%.2f", fee) + " LKR</h2>" +
+                "<p style='color: #888;'>Redirecting to feedback page in 3 seconds...</p>" +
+                "</div>" +
+                "<script>" +
+                "  setTimeout(function() { window.location.href = '/feedback.html'; }, 3000);" +
+                "</script>" +
+                "</body></html>";
     }
-
-    @GetMapping("/exit")
-
-    // U\D fuctions of CRDU operati
-    public String checkOut(@RequestParam String pin) {
-
-        return "Exit recorded for PIN " + pin + ". Total Fee calculated.";
-    }
-
-
-
-
 }

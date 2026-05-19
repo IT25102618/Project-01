@@ -2,13 +2,14 @@ package com.demo.parkingmanagementsystem.component3;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+//handles http rewuest
 @RestController
 @RequestMapping("/parking")
 public class ParkingController {
 
     @GetMapping("/entry")
     // create operation of CRDU operation
+    //rewuest param grabs deteils from URL
     public String checkIn(@RequestParam String plate, @RequestParam String pin) {
         ParkingSession session = new ParkingSession(plate, pin);
         FileHandler.saveSession(session);

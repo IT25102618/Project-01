@@ -10,7 +10,7 @@ public class FileHandler {
 
     private static final String FILE_PATH = "C:UsersNithuDesktopParkingManagementSystemparking_logs.txt";
     // create function of CRDU operation
-    //takes parking session object and store
+
     public static void saveSession(ParkingSession session) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {

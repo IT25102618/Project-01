@@ -41,7 +41,7 @@ public class ParkingController {
 
     @GetMapping("/exit")
 
-    // U\D fuctions of CRDU operations
+    // U\D fuctions of CRDU operati
     public String checkOut(@RequestParam String pin) {
 
         return "Exit recorded for PIN " + pin + ". Total Fee calculated.";

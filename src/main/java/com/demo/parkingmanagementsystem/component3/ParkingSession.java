@@ -3,7 +3,7 @@ package com.demo.parkingmanagementsystem.component3;
 import java.time.LocalDateTime;
 
 public class ParkingSession {
-    // Encapsulation: private variables [cite: 87]
+    // Encapsulation: private variables
     private String plate;
     private String pin;
     private LocalDateTime entryTime;
